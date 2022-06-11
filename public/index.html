@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Video Camera &amp; Screen Capture Recorder</title>
+    <title>Video Camera &amp; Screen Recorder</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/global.css">
@@ -15,27 +15,31 @@
     </style>
 </head>
 <body>
-<h1>Video Camera &amp; Screen Capture Recorder</h1>
+<h1>Video Camera &amp; Screen Recorder</h1>
+<p>Record Video From Camera and Capture Screen using Javascript.</p>
 <div class="container">
     <div class="row">
         <div class="col-md-9">
-            <button id="button-start-stop-screen-capture" class="btn btn-primary">Start Screen Capture</button>
+            <button id="button-start-screen-capture" class="btn btn-primary">Start Screen Capture</button>
+            <button id="button-stop-screen-capture" class="btn">Stop Screen Capture</button>
             <br/>
-            <video id="screen-video" autoplay></video>
+            <video id="video-screen" autoplay></video>
         </div>
         <div class="col-md-3">
-            <button id="button-start-stop-camera" class="btn btn-primary">Start Camera</button>
+            <button id="button-start-camera" class="btn btn-primary">Start Camera</button>
+            <button id="button-stop-camera" class="btn">Stop Camera</button>
             <br/>
-            <video id="camera-video" autoplay></video>
+            <video id="video-camera" autoplay></video>
             <br/>
             <br/>
-            <button id="button-start-stop-recording" class="btn btn-danger">Start Recording</button>
+            <button id="button-start-recording" class="btn btn-danger">Start Recording</button>
+            <button id="button-stop-recording" class="btn">Stop Recording</button>
             <br/>
             <h3>Logs:</h3>
         </div>
     </div>
 </div>
-<script src="js/video-screen-capture-recorder.js"></script>
+<script src="js/recorder.js"></script>
 <script src="js/index.js"></script>
 </body>
 </html>

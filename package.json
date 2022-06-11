@@ -1,8 +1,8 @@
 {
-  "name": "video-screen-capture-recorder",
+  "name": "video-camera-screen-recorder",
   "version": "1.0.0",
-  "description": "HTML5 Video Camera & Screen Capture Recorder, Record Video From Camera and Capture Screen using Javascript",
-  "main": "./src/video-screen-capture-recorder.js",
+  "description": "HTML5 Video Camera & Screen Recorder. Record Video From Camera and Capture Screen using Javascript",
+  "main": "./src/index.js",
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
   },
@@ -20,16 +20,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/basil79/video-screen-capture-recorder.git"
+    "url": "https://github.com/basil79/video-camera-screen-recorder.git"
   },
   "keywords": [
     "video-camera",
     "video-camera-recorder",
     "webcam",
+    "webcam-recorder",
     "screen-capture",
-    "screen-capture-recorder",
     "video",
-    "video-recorder"
+    "video-recorder",
+    "video-camera-screen-recorder"
   ],
   "author": "Basil Goldman",
   "license": "Apache-2.0",

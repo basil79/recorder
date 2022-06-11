@@ -1,8 +1,9 @@
-# video-screen-capture-recorder
+# video-camera-screen-recorder
 
-> HTML5 Video Camera & Screen Capture Recorder
+> HTML5 Video Camera & Screen Recorder.
+>  Record Video From Camera and Capture Screen using Javascript.
 
-This README is for developers who want to use and/or contribute to video-screen-capture-recorder.
+This README is for developers who want to use and/or contribute to video-camera-screen-recorder.
 
 **Table of Contents**
 
@@ -19,8 +20,8 @@ This README is for developers who want to use and/or contribute to video-screen-
 
 ### Using Git
 
-    $ git clone https://github.com/basil79/video-screen-capture-recorder
-    $ cd video-screen-capture-recorder
+    $ git clone https://github.com/basil79/video-camera-screen-recorder
+    $ cd video-camera-screen-recorder
     $ npm ci
 
 
@@ -36,7 +37,7 @@ To build the project for production:
 
 This will generate the following file:
 
-+ `./dist/video-screen-capture-recorder.js` - Minified browser production code
++ `./dist/recorder.js` - Minified browser production code
 
 ## Run
 

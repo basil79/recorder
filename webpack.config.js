@@ -12,7 +12,7 @@ module.exports = function(env, args) {
     entry : './src/index.js',
     output: {
       path: __dirname + (args.mode === 'production' ? '/dist' : '/public/js'),
-      filename: 'video-screen-capture-recorder.js',
+      filename: 'recorder.js',
       library: 'adserve'
     },
     plugins: plugins,

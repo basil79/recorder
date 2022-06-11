@@ -1,7 +1,9 @@
-import {VideoScreenCaptureRecorder} from './video-screen-capture-recorder';
+import Camera from './camera';
+import ScreenCapture from './screen-capture';
 
 const tv = {
-  VideoScreenCaptureRecorder
+  Camera,
+  ScreenCapture
 }
 
 export { tv }
