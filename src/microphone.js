@@ -1,17 +1,17 @@
-import {IS_SAFARI} from './browser';
 import {arrayBufferToBlob} from './utils';
+import {IS_SAFARI} from './browser';
 
-const ScreenCapture = function(el, options) {
+const Microphone = function(el, options) {
 
   if(!(el instanceof Element || el instanceof HTMLDocument)) {
-    throw new Error('screen video slot is not defined');
+    throw new Error('microphone audio slot is not defined');
   }
 
   if(navigator.mediaDevices === undefined) {
     throw new Error('this browser doesn\'t support navigator.mediaDevices');
   }
 
-  this._videoSlot = el;
+  this._audioSlot = el;
 
   this._stream = null;
   this._mediaRecorder = null;
@@ -26,35 +26,34 @@ const ScreenCapture = function(el, options) {
   // Attributes
   this._attributes = {
     isStarted: false,
-    mimeType: IS_SAFARI ? 'video/mp4' : 'video/webm',
+    mimeType: IS_SAFARI ? 'audio/mp4' : 'audio/webm',
     version: '!!#Version#!!'
   }
   // Options
   this._options = Object.assign({
     segmentSize: 5000, // ms
     media: {
-      video: {
-        cursor: 'always'
-      },
-      audio: false
+      audio: true
     }
-  }, options)
+  }, options);
 }
-ScreenCapture.prototype.start = function() {
-  console.log('start capture');
-  navigator.mediaDevices.getDisplayMedia(this._options.media)
+Microphone.prototype.start = function() {
+  console.log('start microphone');
+  navigator.mediaDevices.getUserMedia(this._options.media)
     .then(stream => {
+
       // use the stream
-      this._videoSlot.srcObject = stream;
+      this._audioSlot.srcObject = stream;
       this.dump();
 
       this._mediaRecorder = new MediaRecorder(stream);
       this._recordedChunks = [];
 
       this._mediaRecorder.addEventListener('dataavailable', (event) => {
+        //console.log(event.data);
         // Blob
         const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-        console.log('screen successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
+        console.log('microphone successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
 
         this._recordedChunks.push(recorderBlob); // TODO: remove
         this.onDataAvailable(recorderBlob);
@@ -67,7 +66,6 @@ ScreenCapture.prototype.start = function() {
 
       this._mediaRecorder.start(this._options.segmentSize); // 5000
       console.log(this._mediaRecorder.state);
-
       this._attributes.isStarted = true;
     })
     .catch(error => {
@@ -75,43 +73,43 @@ ScreenCapture.prototype.start = function() {
       this._attributes.isStarted = false;
     });
 }
-ScreenCapture.prototype.stop = function() {
-  console.log('stop capture');
+Microphone.prototype.stop = function() {
+  console.log('stop microphone');
   if(this._mediaRecorder && this._mediaRecorder.state !== 'inactive') {
     this._mediaRecorder.stop();
     console.log(this._mediaRecorder.state);
   }
   try {
-    const tracks = this._videoSlot.srcObject.getTracks();
+    const tracks = this._audioSlot.srcObject.getTracks();
     console.log(tracks);
     tracks.forEach(track => track.stop());
-    this._videoSlot.srcObject = null;
+    this._audioSlot.srcObject = null;
   } catch (e) {}
   this._attributes.isStarted = false;
 }
-ScreenCapture.prototype.dump = function() {
-  const videoTrack = this._videoSlot.srcObject.getVideoTracks()[0];
-  console.log(JSON.stringify(videoTrack.getSettings(), null, 2));
-  console.log(JSON.stringify(videoTrack.getConstraints(), null, 2));
+Microphone.prototype.dump = function() {
+  const audioTrack = this._audioSlot.srcObject.getAudioTracks()[0];
+  console.log(JSON.stringify(audioTrack.getSettings(), null, 2));
+  console.log(JSON.stringify(audioTrack.getConstraints(), null, 2));
 }
-ScreenCapture.prototype.onDataAvailable = function(blob) {
+Microphone.prototype.onDataAvailable = function(chunk) {
   if(this.EVENTS.DataAvailable in this._eventCallbacks) {
     if(typeof this._eventCallbacks[this.EVENTS.DataAvailable] === 'function') {
-      this._eventCallbacks[this.EVENTS.DataAvailable](blob);
+      this._eventCallbacks[this.EVENTS.DataAvailable](chunk);
     }
   }
 }
-ScreenCapture.prototype.addEventListener = function(eventName, callback, context) {
+Microphone.prototype.addEventListener = function(eventName, callback, context) {
   const giveCallback = callback.bind(context);
   this._eventCallbacks[eventName] = giveCallback;
 }
-ScreenCapture.prototype.removeEventListener = function(eventName) {
+Microphone.prototype.removeEventListener = function(eventName) {
   if(eventName in this._eventCallbacks) {
     this._eventCallbacks[eventName] = null;
   }
 }
-ScreenCapture.prototype.getVersion = function() {
+Microphone.prototype.getVersion = function() {
   return this._attributes.version;
 }
 
-export default ScreenCapture;
+export default Microphone;
