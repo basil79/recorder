@@ -24,25 +24,31 @@
             width: 100%;
             height: 100%;
         }
-        #video-camera {
+        #video-camera, #preview-camera {
             transform: scaleX(-1);
         }
     </style>
 </head>
 <body>
-<h1>Video Camera &amp; Screen Recorder</h1>
-<p>Record Video From Camera and Capture Screen using Javascript.</p>
-<button id="button-start-microphone" class="btn btn-primary">Start Microphone</button>
-<button id="button-stop-microphone" class="btn">Stop Microphone</button>
-<br/>
-<div>
-    <audio id="audio-microphone" autoplay></audio>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Video Camera &amp; Screen Recorder</h1>
+            <p>Record Video From Camera and Capture Screen using Javascript.</p>
+            <button id="button-start-microphone" class="btn btn-primary">Start Microphone</button>
+            <button id="button-stop-microphone" class="btn">Stop Microphone</button>
+            <br/>
+            <div>
+                <audio id="audio-microphone" autoplay></audio>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="container">
     <div class="row">
         <div class="col-md-6">
-            <button id="button-start-screen-capture" class="btn btn-primary">Start Screen Capture</button>
-            <button id="button-stop-screen-capture" class="btn">Stop Screen Capture</button>
+            <button id="button-start-screen" class="btn btn-primary">Start Screen</button>
+            <button id="button-stop-screen" class="btn">Stop Screen</button>
             <br/>
             <div class="video-preview">
                 <div class="video-container">
@@ -59,7 +65,12 @@
                     <video id="video-camera" autoplay></video>
                 </div>
             </div>
-            <br/>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
             <br/>
             <button id="button-start-recording" class="btn btn-danger">Start Recording</button>
             <button id="button-stop-recording" class="btn">Stop Recording</button>
@@ -70,6 +81,31 @@
         </div>
     </div>
 </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h3>Preview:</h3>
+        </div>
+        <div class="col-md-3">
+            <p>Screen</p>
+            <div class="video-preview">
+                <div class="video-container">
+                    <video id="preview-screen" autoplay></video>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <p>Camera</p>
+            <div class="video-preview">
+                <div class="video-container">
+                    <video id="preview-camera" autoplay></video>
+                </div>
+            </div>
+            <a id="download-camera"></a>
+        </div>
+    </div>
+</div>
+
 <script src="js/recorder.js"></script>
 <script src="js/index.js"></script>
 </body>

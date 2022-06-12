@@ -1,11 +1,11 @@
 import Microphone from './microphone';
 import Camera from './camera';
-import ScreenCapture from './screen-capture';
+import Screen from './screen';
 
 const tv = {
   Microphone,
   Camera,
-  ScreenCapture
+  Screen
 }
 
 export { tv }

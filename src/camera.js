@@ -19,6 +19,8 @@ const Camera = function(el, options) {
 
   // Events
   this.EVENTS = {
+    StartRecording: 'StartRecording',
+    StopRecording: 'StopRecording',
     DataAvailable: 'DataAvailable'
   }
   this._eventCallbacks = {};
@@ -38,47 +40,22 @@ const Camera = function(el, options) {
     }
   }, options);
 }
-Camera.prototype.start = function() {
-  console.log('start camera');
-  navigator.mediaDevices.getUserMedia(this._options.media)
-    .then(stream => {
-      // use the stream
-      this._videoSlot.srcObject = stream;
-      this.dump();
+Camera.prototype.start = async function() {
+  console.log('camera - start');
+  try {
+    this._stream = await navigator.mediaDevices.getUserMedia(this._options.media);
+    // use the stream
+    this._videoSlot.srcObject = this._stream;
+    this.dump();
 
-      this._mediaRecorder = new MediaRecorder(stream);
-      this._recordedChunks = [];
-
-      this._mediaRecorder.addEventListener('dataavailable', (event) => {
-        // Blob
-        const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-        console.log('camera successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
-        // TODO:
-        this._recordedChunks.push(recorderBlob);
-        this.onDataAvailable(recorderBlob);
-      });
-      this._mediaRecorder.addEventListener('stop', () => {
-        // recording stopped & all blobs sent
-        // TODO:
-        console.log(this._recordedChunks);
-      });
-
-      this._mediaRecorder.start(this._options.segmentSize); // 5000
-      console.log(this._mediaRecorder.state);
-
-      this._attributes.isStarted = true;
-    })
-    .catch(error => {
-      console.log(error);
-      this._attributes.isStarted = false;
-    });
+    this._attributes.isStarted = true;
+  } catch (e) {
+    console.log(e);
+    this._attributes.isStarted = false;
+  }
 }
 Camera.prototype.stop = function() {
-  console.log('stop camera');
-  if(this._mediaRecorder && this._mediaRecorder.state !== 'inactive') {
-    this._mediaRecorder.stop();
-    console.log(this._mediaRecorder.state);
-  }
+  console.log('camera - stop');
   try {
     const tracks = this._videoSlot.srcObject.getTracks();
     console.log(tracks);
@@ -91,6 +68,37 @@ Camera.prototype.dump = function() {
   const videoTrack = this._videoSlot.srcObject.getVideoTracks()[0];
   console.log(JSON.stringify(videoTrack.getSettings(), null, 2));
   console.log(JSON.stringify(videoTrack.getConstraints(), null, 2));
+}
+Camera.prototype.startRecording = function() {
+  if(this._attributes.isStarted && this._stream) {
+    console.log('camera - start recording');
+    this._mediaRecorder = new MediaRecorder(this._stream);
+    this._recordedChunks = [];
+
+    this._mediaRecorder.addEventListener('dataavailable', (event) => {
+      // Blob
+      const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+      console.log('camera - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
+      // TODO:
+      this._recordedChunks.push(recorderBlob);
+      this.onDataAvailable(recorderBlob);
+    });
+    this._mediaRecorder.addEventListener('stop', () => {
+      // recording stopped & all blobs sent
+      // TODO:
+      console.log(this._recordedChunks);
+    });
+
+    this._mediaRecorder.start(5000); // 5000
+    console.log(this._mediaRecorder.state);
+  }
+}
+Camera.prototype.stopRecording = function() {
+  if(this._mediaRecorder && this._mediaRecorder.state !== 'inactive') {
+    console.log('camera - stop recording');
+    this._mediaRecorder.stop();
+    console.log(this._mediaRecorder.state);
+  }
 }
 Camera.prototype.onDataAvailable = function(blob) {
   if(this.EVENTS.DataAvailable in this._eventCallbacks) {

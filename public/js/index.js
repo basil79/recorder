@@ -17,9 +17,15 @@
     logs.appendChild(logItem);
   }
 
+  function getTimestamp() {
+    return new Date().getTime();
+  }
+
 
   // Microphone
-  const microphone = new adserve.tv.Microphone(document.getElementById('audio-microphone'));
+  const microphone = new adserve.tv.Microphone(document.getElementById('audio-microphone'), {
+    segmentSize: 1000
+  });
   console.log('Microphone version is', microphone.getVersion());
 
   const startMicrophoneButton = document.getElementById('button-start-microphone');
@@ -33,8 +39,11 @@
     microphone.stop();
   }, false);
 
+
   // Camera
-  const camera = new adserve.tv.Camera(document.getElementById('video-camera'));
+  const camera = new adserve.tv.Camera(document.getElementById('video-camera'), {
+    segmentSize: 1000
+  });
   console.log('Camera version is', camera.getVersion());
 
   const startCameraButton = document.getElementById('button-start-camera');
@@ -49,33 +58,53 @@
   }, false);
 
 
-  // Screen Capture
-  const screenCapture = new adserve.tv.ScreenCapture(document.getElementById('video-screen'));
-  console.log('ScreenCapture version is', screenCapture.getVersion());
+  // Screen
+  const screen = new adserve.tv.Screen(document.getElementById('video-screen'), {
+    segmentSize: 1000
+  });
+  console.log('Screen version is', screen.getVersion());
 
-  const startScreenCaptureButton = document.getElementById('button-start-screen-capture');
-  const stopScreenCaptureButton = document.getElementById('button-stop-screen-capture');
+  const startScreenButton = document.getElementById('button-start-screen');
+  const stopScreenButton = document.getElementById('button-stop-screen');
 
-  startScreenCaptureButton.addEventListener('click', (event) => {
-    screenCapture.start();
+  startScreenButton.addEventListener('click', (event) => {
+    screen.start();
   }, false);
 
-  stopScreenCaptureButton.addEventListener('click', (event) => {
-    screenCapture.stop();
+  stopScreenButton.addEventListener('click', (event) => {
+    screen.stop();
   }, false);
 
+
+
+
+
+  const microphoneBlobs = [];
+  const cameraBlobs = [];
+  const screenBlobs = [];
+
+
+  let recording = false;
 
   // ondataavailable
   microphone.addEventListener('DataAvailable', (blob) => {
-    appendLog('microphone - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+    //appendLog('microphone - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+    microphoneBlobs.push(blob);
   });
 
   camera.addEventListener('DataAvailable', (blob) => {
-    appendLog('camera - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+    //appendLog('camera - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+    /*cameraBlobs.push({
+      time: getTimestamp(),
+      data: blob
+    });
+     */
+    cameraBlobs.push(blob);
   });
 
-  screenCapture.addEventListener('DataAvailable', (blob) => {
-    appendLog('screen - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+  screen.addEventListener('DataAvailable', (blob) => {
+    //appendLog('screen - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
+    screenBlobs.push(blob);
   });
 
 
@@ -85,11 +114,47 @@
   const stopRecordingButton = document.getElementById('button-stop-recording');
 
   startRecordingButton.addEventListener('click', (event) => {
+    recording = true;
+
+    microphone.startRecording();
+    camera.startRecording();
+    screen.startRecording();
 
   }, false);
 
   stopRecordingButton.addEventListener('click', (event) => {
+    recording = false;
+
+    microphone.stopRecording();
+    camera.stopRecording();
+    screen.stopRecording();
+
+    setTimeout(() => {
+      console.log(microphoneBlobs, cameraBlobs, screenBlobs);
+    }, 1000);
+
+    setTimeout(() => {
+      startCameraPreview();
+    }, 5000);
 
   }, false);
+
+  const previewCamera = document.getElementById('preview-camera');
+  const downloadCamera = document.getElementById('download-camera');
+
+  function startCameraPreview() {
+      // Camera
+      if (cameraBlobs.length) {
+        //let cameraChunks = cameraBlobs.splice(0, 5); // slice and shift
+        console.log(cameraBlobs);
+        previewCamera.src = '';
+        previewCamera.src = URL.createObjectURL(new Blob(cameraBlobs));
+
+        downloadCamera.href = previewCamera.src;
+        downloadCamera.innerHTML = previewCamera.src;
+        downloadCamera.download = 'camera-' + getTimestamp() + '.webm';
+
+      }
+  }
 
 })();

@@ -83,7 +83,7 @@ li+li {
     margin-right: -10px;
 }
 
-.col-md-9, .col-md-6, .col-md-3 {
+.col-md-12, .col-md-9, .col-md-6, .col-md-3 {
     position: relative;
     min-height: 1px;
     padding-right: 10px;
@@ -91,14 +91,15 @@ li+li {
     float: left;
 }
 
+.col-md-12 {
+    width: 100%;
+}
 .col-md-9 {
     width: 75%
 }
-
 .col-md-6 {
     width: 50%
 }
-
 .col-md-3 {
     width: 25%
 }
