@@ -114,6 +114,8 @@
     camera.startRecording();
     screen.startRecording();
 
+
+
   }, false);
 
   stopRecordingButton.addEventListener('click', (event) => {

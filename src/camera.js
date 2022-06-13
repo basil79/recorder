@@ -109,6 +109,11 @@ Camera.prototype.onDataAvailable = function(blob) {
     }
   }
 }
+Camera.prototype.requestData = function() {
+  if(this._mediaRecorder && this._mediaRecorder.state !== 'recording') {
+    return this._mediaRecorder.requestData();
+  }
+}
 Camera.prototype.addEventListener = function(eventName, callback, context) {
   const giveCallback = callback.bind(context);
   this._eventCallbacks[eventName] = giveCallback;
