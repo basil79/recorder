@@ -23,9 +23,7 @@
 
 
   // Microphone
-  const microphone = new adserve.tv.Microphone(document.getElementById('audio-microphone'), {
-    segmentSize: 1000
-  });
+  const microphone = new adserve.tv.Microphone(document.getElementById('audio-microphone'));
   console.log('Microphone version is', microphone.getVersion());
 
   const startMicrophoneButton = document.getElementById('button-start-microphone');
@@ -41,9 +39,7 @@
 
 
   // Camera
-  const camera = new adserve.tv.Camera(document.getElementById('video-camera'), {
-    segmentSize: 1000
-  });
+  const camera = new adserve.tv.Camera(document.getElementById('video-camera'));
   console.log('Camera version is', camera.getVersion());
 
   const startCameraButton = document.getElementById('button-start-camera');
@@ -59,9 +55,7 @@
 
 
   // Screen
-  const screen = new adserve.tv.Screen(document.getElementById('video-screen'), {
-    segmentSize: 1000
-  });
+  const screen = new adserve.tv.Screen(document.getElementById('video-screen'));
   console.log('Screen version is', screen.getVersion());
 
   const startScreenButton = document.getElementById('button-start-screen');
@@ -133,28 +127,6 @@
       console.log(microphoneBlobs, cameraBlobs, screenBlobs);
     }, 1000);
 
-    setTimeout(() => {
-      startCameraPreview();
-    }, 5000);
-
   }, false);
-
-  const previewCamera = document.getElementById('preview-camera');
-  const downloadCamera = document.getElementById('download-camera');
-
-  function startCameraPreview() {
-      // Camera
-      if (cameraBlobs.length) {
-        //let cameraChunks = cameraBlobs.splice(0, 5); // slice and shift
-        console.log(cameraBlobs);
-        previewCamera.src = '';
-        previewCamera.src = URL.createObjectURL(new Blob(cameraBlobs));
-
-        downloadCamera.href = previewCamera.src;
-        downloadCamera.innerHTML = previewCamera.src;
-        downloadCamera.download = 'camera-' + getTimestamp() + '.webm';
-
-      }
-  }
 
 })();

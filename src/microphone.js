@@ -33,7 +33,7 @@ const Microphone = function(el, options) {
   }
   // Options
   this._options = Object.assign({
-    segmentSize: 5000, // ms
+    timeSlice: 5000, // ms
     media: {
       audio: true
     }
@@ -75,13 +75,14 @@ Microphone.prototype.startRecording = function() {
     this._recordedChunks = [];
 
     this._mediaRecorder.addEventListener('dataavailable', (event) => {
-      //console.log(event.data);
-      // Blob
-      const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-      console.log('microphone - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
+      if(event.data.size > 0) {
+        // Blob
+        const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+        console.log('microphone - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
 
-      this._recordedChunks.push(recorderBlob); // TODO: remove
-      this.onDataAvailable(recorderBlob);
+        this._recordedChunks.push(recorderBlob); // TODO: remove
+        this.onDataAvailable(recorderBlob);
+      }
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
@@ -89,7 +90,7 @@ Microphone.prototype.startRecording = function() {
       console.log(this._recordedChunks);
     });
 
-    this._mediaRecorder.start(this._options.segmentSize); // 5000
+    this._mediaRecorder.start(this._options.timeSlice);
     console.log(this._mediaRecorder.state);
   }
 }

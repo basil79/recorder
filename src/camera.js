@@ -33,7 +33,7 @@ const Camera = function(el, options) {
   }
   // Options
   this._options = Object.assign({
-    segmentSize: 5000, // ms
+    timeSlice: 5000, // ms
     media: {
       video: true,
       audio: false
@@ -76,12 +76,14 @@ Camera.prototype.startRecording = function() {
     this._recordedChunks = [];
 
     this._mediaRecorder.addEventListener('dataavailable', (event) => {
-      // Blob
-      const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-      console.log('camera - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
-      // TODO:
-      this._recordedChunks.push(recorderBlob);
-      this.onDataAvailable(recorderBlob);
+      if(event.data.size > 0) {
+        // Blob
+        const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+        console.log('camera - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
+        // TODO:
+        this._recordedChunks.push(recorderBlob);
+        this.onDataAvailable(recorderBlob);
+      }
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
@@ -89,7 +91,7 @@ Camera.prototype.startRecording = function() {
       console.log(this._recordedChunks);
     });
 
-    this._mediaRecorder.start(5000); // 5000
+    this._mediaRecorder.start(this._options.timeSlice);
     console.log(this._mediaRecorder.state);
   }
 }
