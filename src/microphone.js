@@ -15,7 +15,7 @@ const Microphone = function(el, options) {
 
   this._stream = null;
   this._mediaRecorder = null;
-  this._recordedChunks = [];
+  this._audioChunks = [];
 
   // Events
   this.EVENTS = {
@@ -72,22 +72,22 @@ Microphone.prototype.startRecording = function() {
   if(this._attributes.isStarted && this._stream) {
     console.log('microphone - start recording');
     this._mediaRecorder = new MediaRecorder(this._stream);
-    this._recordedChunks = [];
+    this._audioChunks = [];
 
     this._mediaRecorder.addEventListener('dataavailable', (event) => {
       if(event.data.size > 0) {
         // Blob
-        const recorderBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-        console.log('microphone - successfully recorded', recorderBlob.size, 'bytes of', recorderBlob.type, recorderBlob);
+        const recordedBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+        console.log('microphone - successfully recorded', recordedBlob.size, 'bytes of', recordedBlob.type, recordedBlob);
 
-        this._recordedChunks.push(recorderBlob); // TODO: remove
-        this.onDataAvailable(recorderBlob);
+        this._audioChunks.push(recordedBlob); // TODO: remove
+        this.onDataAvailable(recordedBlob);
       }
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
       // TODO:
-      console.log(this._recordedChunks);
+      console.log(this._audioChunks);
     });
 
     this._mediaRecorder.start(this._options.timeSlice);
