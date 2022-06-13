@@ -108,6 +108,11 @@ Microphone.prototype.onDataAvailable = function(blob) {
     }
   }
 }
+Microphone.prototype.requestData = function() {
+  if(this._mediaRecorder && this._mediaRecorder.state !== 'recording') {
+    return this._mediaRecorder.requestData();
+  }
+}
 Microphone.prototype.addEventListener = function(eventName, callback, context) {
   const giveCallback = callback.bind(context);
   this._eventCallbacks[eventName] = giveCallback;
