@@ -28,6 +28,7 @@ const Camera = function(el, options) {
   // Attributes
   this._attributes = {
     isStarted: false,
+    isRecording: false,
     mimeType: IS_SAFARI ? 'video/mp4' : 'video/webm',
     version: '!!#Version#!!'
   }
@@ -75,10 +76,14 @@ Camera.prototype.startRecording = function() {
     this._mediaRecorder = new MediaRecorder(this._stream);
     this._videoChunks = [];
 
-    this._mediaRecorder.addEventListener('dataavailable', (event) => {
-      if(event.data.size > 0) {
+    this._mediaRecorder.addEventListener('start', (e) => {
+      console.log('camera - recording start');
+      this._attributes.isRecording = true;
+    });
+    this._mediaRecorder.addEventListener('dataavailable', (e) => {
+      if(e.data.size > 0) {
         // Blob
-        const recordedBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+        const recordedBlob = arrayBufferToBlob(e.data, this._attributes.mimeType);
         console.log('camera - successfully recorded', recordedBlob.size, 'bytes of', recordedBlob.type, recordedBlob);
         // TODO:
         this._videoChunks.push(recordedBlob);
@@ -87,7 +92,8 @@ Camera.prototype.startRecording = function() {
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
-      // TODO:
+      console.log('camera - recording stop');
+      this._attributes.isRecording = false;
       console.log(this._videoChunks);
     });
 

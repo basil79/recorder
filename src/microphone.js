@@ -28,6 +28,7 @@ const Microphone = function(el, options) {
   // Attributes
   this._attributes = {
     isStarted: false,
+    isRecording: false,
     mimeType: IS_SAFARI ? 'audio/mp4' : 'audio/webm',
     version: '!!#Version#!!'
   }
@@ -74,10 +75,14 @@ Microphone.prototype.startRecording = function() {
     this._mediaRecorder = new MediaRecorder(this._stream);
     this._audioChunks = [];
 
-    this._mediaRecorder.addEventListener('dataavailable', (event) => {
-      if(event.data.size > 0) {
+    this._mediaRecorder.addEventListener('start', (e) => {
+      console.log('microphone - recording start');
+      this._attributes.isRecording = true;
+    });
+    this._mediaRecorder.addEventListener('dataavailable', (e) => {
+      if(e.data.size > 0) {
         // Blob
-        const recordedBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
+        const recordedBlob = arrayBufferToBlob(e.data, this._attributes.mimeType);
         console.log('microphone - successfully recorded', recordedBlob.size, 'bytes of', recordedBlob.type, recordedBlob);
 
         this._audioChunks.push(recordedBlob); // TODO: remove
@@ -86,7 +91,8 @@ Microphone.prototype.startRecording = function() {
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
-      // TODO:
+      console.log('microphone - recording stop');
+      this._attributes.isRecording = false;
       console.log(this._audioChunks);
     });
 
