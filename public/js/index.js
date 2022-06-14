@@ -17,9 +17,14 @@
     logs.appendChild(logItem);
   }
 
-  function getTimestamp() {
-    return new Date().getTime();
-  }
+
+  // Devices
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    devices = devices.filter((d) => d.kind === 'audioinput');
+    console.log(devices);
+    console.log(devices[0].deviceId);
+    //devices = devices.filter((d) => d.kind === 'videoinput');
+  });
 
 
   // Microphone
@@ -88,17 +93,15 @@
 
   camera.addEventListener('DataAvailable', (blob) => {
     //appendLog('camera - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
-    /*cameraBlobs.push({
-      time: getTimestamp(),
-      data: blob
-    });
-     */
     cameraBlobs.push(blob);
   });
 
-  screen.addEventListener('DataAvailable', (blob) => {
+  screen.addEventListener('DataAvailable', async (blob) => {
     //appendLog('screen - successfully recorder ' + blob.size + ' bytes of ' + blob.type);
     screenBlobs.push(blob);
+
+    //let data = await blobToArrayBuffer(blob);
+    //transmitting(data, 'video/mp4'); //; codecs="avc1.42E01E, mp4a.40.2"
   });
 
 
@@ -114,8 +117,6 @@
     camera.startRecording();
     screen.startRecording();
 
-
-
   }, false);
 
   stopRecordingButton.addEventListener('click', (event) => {
@@ -125,10 +126,53 @@
     camera.stopRecording();
     screen.stopRecording();
 
+
     setTimeout(() => {
       console.log(microphoneBlobs, cameraBlobs, screenBlobs);
     }, 1000);
 
   }, false);
+
+
+
+
+
+  const previewScreen = document.getElementById('preview-screen');
+
+  let cache = [];
+  let mediaSource, sourceBuffer;
+  function transmitting(data, type) {
+    console.log('transmitting', data, type);
+    // init playing
+    if(!mediaSource) {
+      mediaSource = new MediaSource();
+      previewScreen.src = URL.createObjectURL(mediaSource);
+      mediaSource.addEventListener('sourceopen', () => {
+        //sourceBuffer = mediaSource.addSourceBuffer(type);
+        //previewScreen.play();
+      });
+    }
+    // mediaSource not ready
+    if(!sourceBuffer) {
+      cache.push(data);
+      return;
+    }
+    if(cache.length) {
+      data = [...cache, data];
+      cache = [];
+    }
+    sourceBuffer.appendBuffer(Uint8Array.from(data));
+  }
+
+  async function blobToArrayBuffer(blob) {
+    if ('arrayBuffer' in blob) return await blob.arrayBuffer();
+
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject;
+      reader.readAsArrayBuffer(blob);
+    });
+  }
 
 })();

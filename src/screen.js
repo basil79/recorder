@@ -28,6 +28,7 @@ const Screen = function(el, options) {
   // Attributes
   this._attributes = {
     isStarted: false,
+    isRecording: false,
     mimeType: IS_SAFARI ? 'video/mp4' : 'video/webm',
     version: '!!#Version#!!'
   }
@@ -77,11 +78,17 @@ Screen.prototype.startRecording = function() {
     this._mediaRecorder = new MediaRecorder(this._stream);
     this._videoChunks = [];
 
-    this._mediaRecorder.addEventListener('dataavailable', (event) => {
-      if(event.data.size > 0) {
+    this._mediaRecorder.addEventListener('start', (e) => {
+      console.log('screen - recording start');
+      this._attributes.isRecording = true;
+    })
+    this._mediaRecorder.addEventListener('dataavailable', (e) => {
+      if(e.data.size > 0) {
         // Blob
-        const recordedBlob = arrayBufferToBlob(event.data, this._attributes.mimeType);
-        console.log('screen - successfully recorded', recordedBlob.size, 'bytes of', recordedBlob.type, recordedBlob);
+        console.log(e.data);
+        const streamingTime = Number(String(Date.now()).slice(-5, -3));
+        const recordedBlob = arrayBufferToBlob(e.data, this._attributes.mimeType);
+        console.log('screen - successfully recorded', recordedBlob.size, 'bytes of', recordedBlob.type, 'streaming time', streamingTime, recordedBlob);
 
         this._videoChunks.push(recordedBlob); // TODO: remove
         this.onDataAvailable(recordedBlob);
@@ -89,7 +96,8 @@ Screen.prototype.startRecording = function() {
     });
     this._mediaRecorder.addEventListener('stop', () => {
       // recording stopped & all blobs sent
-      // TODO:
+      console.log('screen - recording stop');
+      this._attributes.isRecording = false;
       console.log(this._videoChunks);
     });
 
