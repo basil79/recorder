@@ -129,6 +129,34 @@
 
     setTimeout(() => {
       console.log(microphoneBlobs, cameraBlobs, screenBlobs);
+
+
+      (async () => {
+        let type = cameraBlobs[0].type;
+        let blob = new Blob(cameraBlobs, {
+          type: type
+        });
+        let url = URL.createObjectURL(blob);
+        previewScreen.src = url;
+
+        let a = document.createElement('a');
+        a.innerHTML = 'Download file';
+        a.href = url;
+        a.download = type.replace('.', '/');
+        document.body.appendChild(a);
+
+
+
+
+        /*
+        // By chunks
+        let chunk = await blobToArrayBuffer(cameraBlobs[0]);
+        console.log(chunk);
+        //transmitting(data, 'video/mp4'); //; codecs="avc1.42E01E, mp4a.40.2" // 'video/mp4; codecs="avc1.4D401F"'
+        transmitting(chunk, 'video/webm; codecs="vorbis,vp8"');
+         */
+
+      })()
     }, 1000);
 
   }, false);
@@ -138,31 +166,64 @@
 
 
   const previewScreen = document.getElementById('preview-screen');
+  const previewScreen2 = document.getElementById('preview-screen-2');
 
   let cache = [];
   let mediaSource, sourceBuffer;
-  function transmitting(data, type) {
-    console.log('transmitting', data, type);
+  function transmitting(chunk, mimeCodec) {
+    console.log('transmitting', chunk, mimeCodec);
     // init playing
     if(!mediaSource) {
-      mediaSource = new MediaSource();
-      previewScreen.src = URL.createObjectURL(mediaSource);
-      mediaSource.addEventListener('sourceopen', () => {
-        //sourceBuffer = mediaSource.addSourceBuffer(type);
-        //previewScreen.play();
-      });
+      if (MediaSource.isTypeSupported(mimeCodec)) {
+        mediaSource = new MediaSource();
+        previewScreen2.src = URL.createObjectURL(mediaSource);
+        mediaSource.addEventListener('sourceopen', function() {
+          console.log(mediaSource.readyState); // open
+          console.log('sourceopen', chunk, mimeCodec);
+          sourceBuffer = mediaSource.addSourceBuffer(mimeCodec);
+          sourceBuffer.mode = 'sequence';
+          sourceBuffer.addEventListener('updateend', () => {
+            //mediaSource.endOfStream();
+            console.log(mediaSource.readyState); // ended
+          });
+          sourceBuffer.addEventListener('error', (event) => {
+            console.error('sourceBuffer error:', event);
+          });
+          sourceBuffer.appendBuffer(Uint8Array.from(chunk));
+        }, false);
+      } else {
+        console.error('Unsupported MIME type or codec', mimeCodec);
+      }
     }
     // mediaSource not ready
     if(!sourceBuffer) {
-      cache.push(data);
+      cache.push(chunk);
       return;
     }
     if(cache.length) {
-      data = [...cache, data];
+      chunk = [...cache, chunk];
       cache = [];
     }
-    sourceBuffer.appendBuffer(Uint8Array.from(data));
+    console.log('appendBuffer');
+    sourceBuffer.appendBuffer(Uint8Array.from(chunk));
   }
+
+
+
+  /*
+  let reader = new FileReader();
+        let rawData = new ArrayBuffer();
+        reader.loadend = function() {}
+        reader.onload = function(e) {
+            rawData = e.target.result;
+            streamsocket.send(rawData)
+        }
+        reader.readAsArrayBuffer(data)
+   */
+
+
+
+
 
   async function blobToArrayBuffer(blob) {
     if ('arrayBuffer' in blob) return await blob.arrayBuffer();
